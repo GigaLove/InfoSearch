@@ -1,10 +1,15 @@
 package com.iip.search.entity;
 
+/**
+ * 搜索过程路径信息数据结构
+ * @author 别笑我呆
+ *
+ */
 public class PathInfo {
-	private String start;
-	private String end;
-	private int distance;
-	private int pathCost;
+	private String start;	// 出发点
+	private String end;		// 终点
+	private int distance;	// 两点距离
+	private int pathCost;	// 到达终点，目前总的路径开销
 	
 	public PathInfo() {
 		

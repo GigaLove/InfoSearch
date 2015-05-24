@@ -6,11 +6,16 @@ import java.util.Map;
 
 import com.iip.search.tool.ReadData;
 
+/**
+ * 描述问题的数据结构
+ * @author 别笑我呆
+ *
+ */
 public class Problem {
-	private Map<String, Node> nodeMap;
-	private String fileName;
-	private String initalState;
-	private String goalState;
+	private Map<String, Node> nodeMap;		// 用于整个问题中所有节点的信息
+	private String fileName;				// 问题信息的存储文件
+	private String initalState;				// 问题初始节点
+	private String goalState;				// 问题目标节点
 	
 	public Problem() {
 		
@@ -110,6 +115,23 @@ public class Problem {
 				nodeMap.put(neiNodeName, neiNode);
 			}
 		}
+	}
+	
+	/**
+	 * 读取辅助信息
+	 * @param fileName
+	 * @return
+	 */
+	public static Map<String, Integer> readAssistInfo(String fileName) {
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		
+		List<String[]> dataList = ReadData.readCommaFile(fileName);
+		
+		for (String[] dataArray : dataList) {
+			map.put(dataArray[0], Integer.parseInt(dataArray[1]));
+		}
+		
+		return map;
 	}
 	
 	public static void main(String[] args) {

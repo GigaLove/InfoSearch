@@ -1,7 +1,6 @@
 package com.iip.search;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -15,45 +14,54 @@ import com.iip.search.entity.Node;
 import com.iip.search.entity.PathInfo;
 import com.iip.search.entity.Problem;
 import com.iip.search.entity.SearchResult;
-import com.iip.search.tool.ReadData;
 
 public class GoalSearch {
-	
+	// 声明搜索结果
 	private static final String SUCCESS = "success";
 	private static final String FAILURE = "failure";
 	private static final String CUTOFF = "cutoff"; 
 	
-	public static SearchResult BFS(Problem problem) {		
-		Map<String, Node> nodeMap = problem.getNodeMap();
-		Node initNode = nodeMap.get(problem.getInitalState());
+	/**
+	 * 宽度优先搜索
+	 * @param problem 问题描述
+	 * @return 搜索结果
+	 */
+	public static SearchResult BFS(Problem problem) {
+		Map<String, Node> nodeMap = problem.getNodeMap();	// 获取节点map
+		Node initNode = nodeMap.get(problem.getInitalState());	// 获取初识节点
 		Node node = null;
-		Map<String, Integer> neighbourMap = null;
+		Map<String, Integer> neighbourMap = null;	// 声明邻居节点map
 		
 		SearchResult seResult = new SearchResult(problem.getInitalState(), 
-				problem.getGoalState(), "BFS");
+				problem.getGoalState(), "BFS");	// 初始化搜索结果数据结构
 		List<PathInfo> pathList = new ArrayList<PathInfo>();
 		
+		// 目标测试
 		if (problem.goalTest(initNode.getName())) {
 			seResult.setRes(SUCCESS);
 			return seResult;
 		}
 		
+		// 声明边界FIFO队列frontier和explored扩展集
 		Queue<Node> frontier = new LinkedList<Node>();
 		frontier.add(initNode);
 		Set<String> explored = new HashSet<String>();
 		
 		while (true) {
+			// 判断边界集是否还有内容，无则搜索失败
 			if (frontier.isEmpty()) {
 				seResult.setRes(FAILURE);
 				seResult.setPathList(pathList);
 				return seResult;
 			}
 			
+			// 获取头节点，添加到扩展集explored中
 			node = frontier.poll();
 			explored.add(node.getName());
 			
 			neighbourMap = node.getNeighbour();
 			
+			// 迭代邻居节点
 			Iterator<Entry<String, Integer>> iter = neighbourMap.entrySet().iterator();
 			while (iter.hasNext()) {
 				Entry<String, Integer> entry = (Entry<String, Integer>) iter.next();
@@ -62,6 +70,7 @@ public class GoalSearch {
 				Node cNode = problem.childNode(neighName);
 				cNode.setPathCost(node.getPathCost() + distance);
 				
+				// 判断邻居节点是否在frontier中或者explored中，无添加到frontier中
 				if (!frontier.contains(cNode) && !explored.contains(cNode.getName())) {
 					PathInfo pathInfo = new PathInfo(node.getName(), neighName, distance, 
 							cNode.getPathCost());
@@ -77,6 +86,11 @@ public class GoalSearch {
 		}
 	}
 	
+	/**
+	 * 采用一致代价策略进行目标搜索
+	 * @param problem
+	 * @return
+	 */
 	public static SearchResult IDS(Problem problem) {
 		Map<String, Node> nodeMap = problem.getNodeMap();
 		Node initNode = nodeMap.get(problem.getInitalState());
@@ -147,6 +161,11 @@ public class GoalSearch {
 		}
 	}
 	
+	/**
+	 * 一致代价搜索策略frontier队列的节点插入实现
+	 * @param frontier	边界队列
+	 * @param node	插入节点
+	 */
 	private static void insert2Frontier(LinkedList<Node> frontier, Node node) {
 		int index;
 		
@@ -158,6 +177,12 @@ public class GoalSearch {
 		frontier.add(index, node);
 	}
 	
+	/**
+	 * 受限深度优先搜索策略
+	 * @param problem	问题描述
+	 * @param limit		限制深度
+	 * @return
+	 */
 	public static SearchResult DLS(Problem problem, int limit) {
 		Node initNode = problem.getNodeMap().get(problem.getInitalState());
 		
@@ -172,19 +197,30 @@ public class GoalSearch {
 		return seResult;
 	}
 	
+	/**
+	 * 递归实现深度优先搜索
+	 * @param node		搜索节点
+	 * @param problem	问题
+	 * @param limit		限制深度
+	 * @param pathList	路径信息
+	 * @return
+	 */
 	private static String recursiveDLS(Node node, Problem problem, int limit, 
 			List<PathInfo> pathList) {
 		
+		// 目标测试
 		if (problem.goalTest(node.getName())) {
 			return SUCCESS;
 		}
 		else if (limit == 0) {
+			// limit变为0，则不再向下搜索
 			return CUTOFF;
 		}
 		else {
 			boolean cutoff_occurred = false;
 			Map<String, Integer> neighbourMap = node.getNeighbour();
 			
+			// 迭代邻居节点
 			Iterator<Entry<String, Integer>> iter = neighbourMap.entrySet().iterator();
 			while (iter.hasNext()) {
 				Entry<String, Integer> entry = (Entry<String, Integer>) iter.next();
@@ -214,22 +250,17 @@ public class GoalSearch {
 		}
 	}
 	
-	private static Map<String, Integer> readAssistInfo(String fileName) {
-		Map<String, Integer> map = new HashMap<String, Integer>();
-		
-		List<String[]> dataList = ReadData.readCommaFile(fileName);
-		
-		for (String[] dataArray : dataList) {
-			map.put(dataArray[0], Integer.parseInt(dataArray[1]));
-		}
-		
-		return map;
-	}
-	
-	public static SearchResult AStarSearch(Problem problem, String fileName) {		
+	/**
+	 * A* 算法搜索实现
+	 * @param problem	问题描述
+	 * @param fileName  辅助信息文件名，用以当作h*函数
+	 * @return
+	 */
+	public static SearchResult AStarSearch(Problem problem, String fileName) {	
+		// 初始化节点信息
 		Map<String, Node> nodeMap = problem.getNodeMap();
 		Map<String, Integer> neighbourMap = null;
-		Map<String, Integer> hMap = readAssistInfo(fileName);
+		Map<String, Integer> hMap = Problem.readAssistInfo(fileName);
 		Node initNode = nodeMap.get(problem.getInitalState());
 		Node node = null;
 		
@@ -244,6 +275,7 @@ public class GoalSearch {
 		Set<String> explored = new HashSet<String>();
 		
 		while (true) {
+			// 判断frontier是否为空，是否无法继续扩展，是返回failure
 			if (frontier.isEmpty()) {
 				seResult.setRes(FAILURE);
 				seResult.setPathList(pathList);
@@ -251,7 +283,7 @@ public class GoalSearch {
 			}
 			
 			node = frontier.poll();
-			
+			// 目标测试
 			if (problem.goalTest(node.getName())) {
 				seResult.setRes(SUCCESS);
 				seResult.setPathList(pathList);
@@ -261,6 +293,7 @@ public class GoalSearch {
 			explored.add(node.getName());
 			neighbourMap = node.getNeighbour();
 			
+			// 迭代邻居节点
 			Iterator<Entry<String, Integer>> iter = neighbourMap.entrySet().iterator();
 			while (iter.hasNext()) {
 				Entry<String, Integer> entry = (Entry<String, Integer>) iter.next();
@@ -297,6 +330,12 @@ public class GoalSearch {
 		}	
 	}
 	
+	/**
+	 * 向A*算法frontier队列节点基于f(n)的插入实现
+	 * @param frontier	边界集
+	 * @param node	插入节点
+	 * @param map	辅助信息，充当h*(n)
+	 */
 	private static void insert2Frontier(LinkedList<Node> frontier, Node node, 
 			Map<String, Integer> map) {
 		int index;

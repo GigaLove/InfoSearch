@@ -2,12 +2,17 @@ package com.iip.search.entity;
 
 import java.util.List;
 
+/**
+ * 搜索结果数据结构
+ * @author 别笑我呆
+ *
+ */
 public class SearchResult {
-	private String initState;
-	private String goalState;
-	private List<PathInfo> pathList;
-	private String res;
-	private String searchMethod;
+	private String initState;		// 搜索的初始节点
+	private String goalState;		// 搜索的目标节点
+	private List<PathInfo> pathList;	// 搜索过程中经过的路径
+	private String res;				// 搜索结果: success, failure, cutoff
+	private String searchMethod;	// 采用的搜索策略
 	
 	public SearchResult() {
 	}
@@ -59,6 +64,9 @@ public class SearchResult {
 		this.searchMethod = searchMethod;
 	}
 
+	/**
+	 * 返回输出结果信息
+	 */
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub

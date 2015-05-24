@@ -2,10 +2,14 @@ package com.iip.search.entity;
 
 import java.util.Map;
 
+/**
+ * 节点数据结构
+ * @author 别笑我呆
+ */
 public class Node {
-	private String name;
-	private Map<String, Integer> neighbour;
-	private int pathCost;
+	private String name;	// 节点名
+	private Map<String, Integer> neighbour;		// 邻居节点信息
+	private int pathCost;	// 路径消耗
 	
 	public Node() {
 	}

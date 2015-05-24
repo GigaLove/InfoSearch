@@ -44,6 +44,7 @@ class UIFrame extends JFrame {
 	
 
 	public UIFrame() {
+		// 初始化frame信息，并添加panel
 		Toolkit kit = Toolkit.getDefaultToolkit();
 		Dimension screenSize = kit.getScreenSize();
 		int x = screenSize.width / 3;
@@ -63,14 +64,14 @@ class UIFrame extends JFrame {
 class UIPanel extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
+	// 初始问题信息
 	private static final String RUMANNIA_MAP = "Rumania-map.txt";
 	private static final String RUMANNIA_DISTANCE = "Rumania-distance.txt";
 	private static final String RUMANNIA_PHOTO = "Rumania-photo.png";
 	private static final String HIT_MAP = "HIT-map.txt";
 	private static final String HIT_DISTANCE = "HIT-distance.txt";
 	private static final String HIT_PHOTO = "HIT-photo.png";
-	
-	
+		
 	private int pType;
 	private int sType;
 
@@ -146,24 +147,33 @@ class UIPanel extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
+		
+		// 判断问题类型
 		if (e.getSource() == radioButtons[0]) {
+			// 罗马尼亚问题，并打开相应的图片
 			pType = 0;
 			openPhoto(RUMANNIA_PHOTO);
 		}
 		else if (e.getSource() == radioButtons[1]) {
+			// 哈工大问题，并打开相应的图片
 			pType = 1;
 			openPhoto(HIT_PHOTO);
 		}
+		// 判断搜索策略
 		else if (e.getSource() == radioButtons[2]) {
+			// BFS
 			sType = 0;
 		}
 		else if (e.getSource() == radioButtons[3]) {
+			// IDS
 			sType = 1;
 		}
 		else if (e.getSource() == radioButtons[4]) {
+			// DLS
 			sType = 2;
 		}
 		else if (e.getSource() == radioButtons[5]) {
+			// A*
 			sType = 3;
 		}
 		else {
@@ -172,6 +182,7 @@ class UIPanel extends JPanel implements ActionListener {
 			String endStr = endTextField.getText().trim();
 			SearchResult searchResult = null;
 			
+			// 判断输入是否有效
 			if (startStr == null || startStr.equals("")) {
 				JOptionPane.showMessageDialog(UIPanel.this, "请输入出发地");
 				return;
@@ -190,6 +201,7 @@ class UIPanel extends JPanel implements ActionListener {
 						HIT_PHOTO);
 			}
 			
+			// 输出结果信息
 			if (searchResult != null) {
 				outputTextArea.append(searchResult.toString());
 			}
@@ -201,6 +213,7 @@ class UIPanel extends JPanel implements ActionListener {
 		Problem p = new Problem(pStr, startStr, endStr);
 		p.readProblem();
 		
+		// 判断出发地和目的地输入是否有效
 		if (!p.getNodeMap().containsKey(startStr)) {
 			JOptionPane.showMessageDialog(UIPanel.this, "请输入有效出发地");
 			return null;
@@ -242,6 +255,10 @@ class UIPanel extends JPanel implements ActionListener {
 		return searchResult;
 	}
 	
+	/**
+	 * 调用系统方法，打开问题图片
+	 * @param fileName
+	 */
 	private void openPhoto(String fileName) {
 		Desktop desk = Desktop.getDesktop();
 		File file = new File(fileName);
